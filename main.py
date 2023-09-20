@@ -15,9 +15,9 @@ class Main(tk.Tk):
         super().__init__()
 
         # Set the geometry of the main window
-        self.geometry("1040x680")
+        self.geometry("1280x720")
 
-        self.title("Libreria Universo")
+        self.title("Pixel to Pencil")
 
         # Create the container frame
         self.container = tk.Frame(self, bg="#252525")
