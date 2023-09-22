@@ -25,7 +25,7 @@ class Menu(tk.Frame):
         self.image_label.place(x=20, y=80)
 
         #Generations input
-        label_generations = ctk.CTkLabel(self, text="Cantidad de generaciones", fg_color="transparent", font=font_frame)
+        label_generations = ctk.CTkLabel(self, text="Cantidad de generaciones", fg_color="transparent", font=font_frame, text_color="white")
         label_generations.place(x=520, y= 80)
 
         self.entry_generations = ctk.CTkEntry(self, width=150, height=30, font=font_frame, border_width=2)
@@ -33,7 +33,7 @@ class Menu(tk.Frame):
         self.entry_generations.place(x=540, y=110)
 
         #Poblations input
-        label_poblations = ctk.CTkLabel(self, text="Tamaño de poblaciones", fg_color="transparent", font=font_frame)
+        label_poblations = ctk.CTkLabel(self, text="Tamaño de poblaciones", fg_color="transparent", font=font_frame, text_color="white")
         label_poblations.place(x=520, y= 120+50)
 
         self.entry_poblations = ctk.CTkEntry(self, width=150, height=30, font=font_frame, border_width=2)
