@@ -50,7 +50,7 @@ class Menu(tk.Frame):
         file_path = filedialog.askopenfilename(filetypes=[("", "*.png;*.jpg;*.jpeg;*.gif")])
         if file_path:
             imported_image = Image.open(file_path)
-            image = imported_image.resize((400, 400), Image.ANTIALIAS)
+            image = imported_image.resize((400, 400), Image.LANCZOS)
             photo = ImageTk.PhotoImage(image)
 
             # Update the label to display the loaded image

@@ -18,3 +18,15 @@ class ImageProcessor():
             return pixel_values
         else:
             print("Error, an image hasn't been loaded")
+
+    def pixelate(image, pixel_size):
+        width, height = image.size
+        small_image = image.resize(
+            (width // pixel_size, height // pixel_size),
+            resample=Image.NEAREST
+        )
+        result_image = small_image.resize(
+            (width, height),
+            Image.NEAREST
+        )
+        return result_image

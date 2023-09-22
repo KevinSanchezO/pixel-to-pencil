@@ -4,6 +4,7 @@ class ControllerGenetic():
     def __init__(self):
         self.image = None
         self.pixels_image = None
+        self.artistic_image = None
 
         #instance of ImageProcessor
         self.image_processor = ImageProcessor()
@@ -13,5 +14,9 @@ class ControllerGenetic():
         self.image_processor.process_image(image)
 
         self.pixels_image = self.image_processor.decompose_image()
+
         print(self.pixels_image)
         print(len(self.pixels_image))
+
+    def pixelate_image(self):
+        self.artistic_image = self.image_processor.pixelate(self.image)
