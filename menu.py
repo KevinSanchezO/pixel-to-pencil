@@ -1,7 +1,8 @@
 import tkinter as tk
 import customtkinter as ctk
 from tkinter import filedialog
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageDraw
+import random
 
 from controller_genetic import ControllerGenetic
 
@@ -23,6 +24,11 @@ class Menu(tk.Frame):
         # Create a label to display the loaded image
         self.image_label = tk.Label(self)
         self.image_label.place(x=20, y=80)
+
+        photo = self.draw_image()
+
+        self.image_label.configure(image=photo)
+        self.image_label.image = photo
 
         #Generations input
         label_generations = ctk.CTkLabel(self, text="Cantidad de generaciones", fg_color="transparent", font=font_frame, text_color="white")
@@ -58,3 +64,18 @@ class Menu(tk.Frame):
             self.image_label.image = photo
 
             self.controller_genetic.proccess_pixels(imported_image)
+
+    def draw_image(self):
+        imagen = Image.new("RGB", (400, 400))
+
+        # Crea un objeto ImageDraw para dibujar en la imagen
+        draw = ImageDraw.Draw(imagen)
+
+        # Llena la imagen con colores aleatorios
+        for x in range(400):
+            for y in range(400):
+                color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+                draw.point((x, y), fill=color)
+        pixels_image = imagen
+
+        return ImageTk.PhotoImage(pixels_image)

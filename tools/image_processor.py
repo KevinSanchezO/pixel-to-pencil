@@ -19,7 +19,7 @@ class ImageProcessor():
         else:
             print("Error, an image hasn't been loaded")
 
-    def pixelate(image, pixel_size):
+    def pixelate(self, image, pixel_size):
         width, height = image.size
         small_image = image.resize(
             (width // pixel_size, height // pixel_size),
