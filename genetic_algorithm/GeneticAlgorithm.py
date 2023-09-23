@@ -1,11 +1,12 @@
 import random
 from genetic import Genetic
-from color_obtainer import ColorObtainer
+import numpy as np
 
 class GeneticAlgorithm:
-    def __init__(self, population_size, genes_sizeX, genes_sizeY, objective, noChange, parents, max_generation, mutation, crossover_num, color_obtainer):
+    def __init__(self, population_size, genes_sizeX, genes_sizeY, objective, noChange, parents, max_generation, mutation, crossover_num, color_obtainer, with_pallete):
         self.first_gen = Genetic()             #esta clase se encarga de procesar las imagenes random iniciales
-        self.color_obtainer = color_obtainer   #
+        self.color_obtainer = color_obtainer   #paleta de colores
+        self.withPallete = with_pallete        #permite usar o no la paleta de colores de la imagen
         self.population_size = population_size #tamaño de poblacion
         self.genes_sizeX = genes_sizeX         #tamaño horizontal de la imagen
         self.genes_sizeY = genes_sizeY         #tamaño vertical de la imagen  
@@ -68,6 +69,8 @@ class GeneticAlgorithm:
                     # # print(self.genes_sizeX)
                     #     print(self.populationFitnessNoChange[0][0][0])
                     if(not self.populationFitnessNoChange[i][j][k]): #si el individuo i de la poblacion en su lista de no cambiar en la pocisión [j][k] es falso, se permite preguntar, sino ya se sabe que es bueno el pixel
+                        
+                        #print((self.population[i][j][k] == self.objective[j][k]).all())
                         if((self.population[i][j][k] == self.objective[j][k]).all()):   #si el individuo i en la posicion [j][k] tiene el mismo pixel que el objetivo en la posición [j][k] siga
                             fitness += 1   #se le suma un 1 al fitness
                             #print("entro")
@@ -111,7 +114,7 @@ class GeneticAlgorithm:
             child += [genoma]
         return child
 
-    #Cruza de forma random los genes y da la posibilidad de mutar 33% pixel por pixel  //aqui no aplica el nochange
+    #Cruza de forma random los genes //aqui no aplica el nochange
     def crossover(self, parent1, parent2):
         child = []
         for i in range(self.genes_sizeY):
@@ -140,7 +143,10 @@ class GeneticAlgorithm:
                 elif(numero_aleatorio == 0):
                     gen = parent2[i][j]
                 else:
-                    gen = [random.randint(0, 255) for _ in range(3)]
+                    if(self.withPallete):
+                        gen = np.array(random.choice(self.color_obtainer))
+                    else:
+                        gen = [random.randint(0, 255) for _ in range(3)]
                 genoma += [gen]
             child += [genoma]
         return child
@@ -157,7 +163,10 @@ class GeneticAlgorithm:
                 genoma = parent2[i]
             else:
                 for _ in range(self.genes_sizeX):
-                    gen = [random.randint(0, 255) for _ in range(3)]
+                    if(self.withPallete):
+                        gen = np.array(random.choice(self.color_obtainer))
+                    else:
+                        gen = [random.randint(0, 255) for _ in range(3)]
                     genoma += [gen]
             child += [genoma]
         return child
@@ -174,7 +183,10 @@ class GeneticAlgorithm:
                 elif(parent2NoChange[i][j]):
                     gen = parent2[i][j]
                 else:
-                    gen = [random.randint(0, 255) for _ in range(3)]
+                    if(self.withPallete):
+                        gen = np.array(random.choice(self.color_obtainer))
+                    else:
+                        gen = [random.randint(0, 255) for _ in range(3)]
                 genoma += [gen]
             child += [genoma]
         return child
@@ -210,15 +222,12 @@ class GeneticAlgorithm:
             child = []
             if(self.noChange):
                 if(mutation >= (100 - self.mutation_percent)):
-                    print("ncm")
                     #aca lo que hace es que crea un hijo con el alfa y con el padre 2 que saca de la lista de los mejores padres segun el numero aleatorio,
                     #le envia la matriz de genes de ambos padres y la matris de genes que cambian o no del alfa y del padre 2
                     child = self.crossoverIfMuteNoChange(self.population[self.alpha_male], self.population[parents[parent2]], self.populationFitnessNoChange[self.alpha_male], self.populationFitnessNoChange[parents[parent2]])
                 else:
-                    print("ncwm")
                     child = self.crossoverNoChange(self.population[self.alpha_male], self.population[parents[parent2]], self.populationFitnessNoChange[self.alpha_male])
             else:
-                print("crossover")
                 if(mutation >= (100 - self.mutation_percent)): #si muta
                     mutation2 = random.randint(0, 2 - 1) #buscamos cual metodo de mutacion
                     if (mutation2):   #si es el 1

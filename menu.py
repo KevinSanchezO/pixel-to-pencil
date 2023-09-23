@@ -79,10 +79,11 @@ class Menu(tk.Frame):
         noChange = True
         parents = 10
         max_generaion = 300
-        mutation = 90
+        mutation = 5
         crossover_num = 2
         color_obtainer = ColorObtainer()
         color_pallete = color_obtainer.generate_color_array(self.controller_genetic.artistic_image)
-
-        algorithm = GeneticAlgorithm(population, x, y, image_objective, noChange, parents, max_generaion, mutation, crossover_num, color_pallete)
+        color_pallete2 = [sublist[:-1] for sublist in color_pallete]
+        print(color_pallete2)
+        algorithm = GeneticAlgorithm(population, x, y, image_objective, noChange, parents, max_generaion, mutation, crossover_num, color_pallete2, True)
         algorithm.execute_genetic_algorithm()
