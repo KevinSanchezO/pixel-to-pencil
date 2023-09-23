@@ -54,7 +54,7 @@ class Menu(tk.Frame):
         self.image_genetic_label = tk.Label(self)
         self.image_genetic_label.place(x=780,y=80)
 
-        print(self.first_gen.draw_image(400, 400))
+        print(self.first_gen.draw_blank_image(400, 400))
         
 
     def load_image(self):
