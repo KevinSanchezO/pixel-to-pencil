@@ -5,6 +5,7 @@ from PIL import Image, ImageTk, ImageDraw
 import random
 
 from controller_genetic import ControllerGenetic
+from genetic import Genetic
 
 class Menu(tk.Frame):
     def __init__(self, parent, controller):
@@ -12,6 +13,7 @@ class Menu(tk.Frame):
         self.controller = controller
 
         self.controller_genetic = ControllerGenetic()
+        self.first_gen = Genetic()
 
         label1 = tk.Label(self, text="").grid(row=0, column=0,padx=1000,pady=1000)
 
@@ -25,10 +27,10 @@ class Menu(tk.Frame):
         self.image_label = tk.Label(self)
         self.image_label.place(x=20, y=80)
 
-        photo = self.draw_image()
+        # photo = self.draw_image()
 
-        self.image_label.configure(image=photo)
-        self.image_label.image = photo
+        # self.image_label.configure(image=photo)
+        # self.image_label.image = photo
 
         #Generations input
         label_generations = ctk.CTkLabel(self, text="Cantidad de generaciones", fg_color="transparent", font=font_frame, text_color="white")
@@ -51,6 +53,9 @@ class Menu(tk.Frame):
 
         self.image_genetic_label = tk.Label(self)
         self.image_genetic_label.place(x=780,y=80)
+
+        print(self.first_gen.draw_image())
+        
 
     def load_image(self):
         file_path = filedialog.askopenfilename(filetypes=[("", "*.png;*.jpg;*.jpeg;*.gif")])
