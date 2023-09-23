@@ -1,9 +1,11 @@
 import random
 from genetic import Genetic
+from color_obtainer import ColorObtainer
 
 class GeneticAlgorithm:
-    def __init__(self, population_size, genes_sizeX, genes_sizeY, objective, noChange, parents, max_generation, mutation, crossover_num):
+    def __init__(self, population_size, genes_sizeX, genes_sizeY, objective, noChange, parents, max_generation, mutation, crossover_num, color_obtainer):
         self.first_gen = Genetic()             #esta clase se encarga de procesar las imagenes random iniciales
+        self.color_obtainer = color_obtainer   #
         self.population_size = population_size #tamaño de poblacion
         self.genes_sizeX = genes_sizeX         #tamaño horizontal de la imagen
         self.genes_sizeY = genes_sizeY         #tamaño vertical de la imagen  

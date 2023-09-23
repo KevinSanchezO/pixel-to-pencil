@@ -7,6 +7,7 @@ import random
 from controller_genetic import ControllerGenetic
 from genetic import Genetic
 from genetic_algorithm.GeneticAlgorithm import GeneticAlgorithm
+from color_obtainer import ColorObtainer
 
 class Menu(tk.Frame):
     def __init__(self, parent, controller):
@@ -26,7 +27,7 @@ class Menu(tk.Frame):
 
         # Create a label to display the loaded image
         self.image_label = tk.Label(self)
-        self.image_label.place(x=20, y=80)
+        self.image_label.place(x=20, y=60)
 
         # photo = self.draw_image()
 
@@ -53,7 +54,7 @@ class Menu(tk.Frame):
         exec_button.place(x=540, y=250)
 
         self.image_genetic_label = tk.Label(self)
-        self.image_genetic_label.place(x=780,y=80)
+        self.image_genetic_label.place(x=780,y=60)
 
     def load_image(self):
         file_path = filedialog.askopenfilename(filetypes=[("", "*.png;*.jpg;*.jpeg;*.gif")])
@@ -80,6 +81,8 @@ class Menu(tk.Frame):
         max_generaion = 300
         mutation = 90
         crossover_num = 2
-        algorithm = GeneticAlgorithm(population, x, y, image_objective, noChange, parents, max_generaion, mutation, crossover_num)
+        color_obtainer = ColorObtainer()
+        color_pallete = color_obtainer.generate_color_array(self.controller_genetic.artistic_image)
 
+        algorithm = GeneticAlgorithm(population, x, y, image_objective, noChange, parents, max_generaion, mutation, crossover_num, color_pallete)
         algorithm.execute_genetic_algorithm()

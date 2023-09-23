@@ -30,3 +30,7 @@ class ImageProcessor():
             Image.NEAREST
         )
         return result_image
+    
+    def convert_array_image(self, rgb_array):
+        imagen = Image.fromarray(rgb_array)
+        return imagen
