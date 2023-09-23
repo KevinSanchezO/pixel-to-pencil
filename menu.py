@@ -77,8 +77,8 @@ class Menu(tk.Frame):
         x = len(image_objective[0])
         noChange = True
         parents = 10
-        max_generaion = 30
-        mutation = 40
+        max_generaion = 300
+        mutation = 90
         crossover_num = 2
         algorithm = GeneticAlgorithm(population, x, y, image_objective, noChange, parents, max_generaion, mutation, crossover_num)
 
