@@ -6,6 +6,7 @@ import random
 
 from controller_genetic import ControllerGenetic
 from genetic import Genetic
+from genetic_algorithm.GeneticAlgorithm import GeneticAlgorithm
 
 class Menu(tk.Frame):
     def __init__(self, parent, controller):
@@ -54,9 +55,6 @@ class Menu(tk.Frame):
         self.image_genetic_label = tk.Label(self)
         self.image_genetic_label.place(x=780,y=80)
 
-        print(self.first_gen.draw_blank_image(400, 400))
-        
-
     def load_image(self):
         file_path = filedialog.askopenfilename(filetypes=[("", "*.png;*.jpg;*.jpeg;*.gif")])
         if file_path:
@@ -70,17 +68,18 @@ class Menu(tk.Frame):
 
             self.controller_genetic.proccess_pixels(imported_image)
 
-    def draw_image(self):
-        imagen = Image.new("RGB", (400, 400))
+            self.start_algorithm()
 
-        # Crea un objeto ImageDraw para dibujar en la imagen
-        draw = ImageDraw.Draw(imagen)
+    def start_algorithm(self):
+        population = 20
+        image_objective = self.controller_genetic.pixels_image
+        y = len(image_objective) 
+        x = len(image_objective[0])
+        noChange = True
+        parents = 10
+        max_generaion = 30
+        mutation = 40
+        crossover_num = 2
+        algorithm = GeneticAlgorithm(population, x, y, image_objective, noChange, parents, max_generaion, mutation, crossover_num)
 
-        # Llena la imagen con colores aleatorios
-        for x in range(400):
-            for y in range(400):
-                color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-                draw.point((x, y), fill=color)
-        pixels_image = imagen
-
-        return ImageTk.PhotoImage(pixels_image)
+        algorithm.execute_genetic_algorithm()

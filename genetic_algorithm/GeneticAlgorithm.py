@@ -10,7 +10,7 @@ class GeneticAlgorithm:
         self.objective = objective             #imagen objetivo  Matriz pixeles
         self.population = []                   #Poblacion de la generacion [Matrizpixeles, Matrizpixeeles, ...]
         self.populationFitness = []            #Fitness de cada individuo de la poblacion, el numero %  [ 1, 2, 3, ..., 0.5 ]
-        self.populationFitnesNoChange = []     #Fitnes de cada individuo que no sirve cambiar, la matriz tendrá true cuando el gen es el indicado y false si no [[true, false, false,..], [true,false,...],...]
+        self.populationFitnessNoChange = []     #Fitnes de cada individuo que no sirve cambiar, la matriz tendrá true cuando el gen es el indicado y false si no [[true, false, false,..], [true,false,...],...]
         self.alpha_male = 0                    #Mejor Fitness de la población actual indice del macho alfa
         self.generation = 1                    #Numero de generación
         self.noChange = noChange               #será un boleano diciendo si es permitido o no el cambio de los genes iguales al objetivo en cada individuo
@@ -22,37 +22,38 @@ class GeneticAlgorithm:
 
     #Funcion encargada de inicializar las poblaciones en imagenes random e imagenes blancas
     def population_init(self):
-        for _ in range(self.poblacion_size/2):
-            self.population  += self.first_gen.draw_blank_image(self.genes_sizeX, self.genes_sizeY)
-        for _ in range(self.poblacion_size/2):
-            self.population += self.first_gen.draw_image(self.genes_sizeX, self.genes_sizeY)
+        for _ in range((self.population_size//2)):
+            self.population  += [self.first_gen.draw_blank_image(self.genes_sizeX, self.genes_sizeY)]
+        for _ in range((self.population_size//2)):
+            self.population += [self.first_gen.draw_image(self.genes_sizeX, self.genes_sizeY)]
         if(self.noChange):
             self.populationFitnessNoChange = self.create_false_matriz()
 
     #Agrega el fitnes de cada individuo evaluandolo con el objetivo, tiene en cuenta si se quiere cambiar o no el pixel
     def fitness_calculation_No_Change(self):  #esta se usará para el fitnes cuando la opcion no change esté en true
-        for i in range(self.poblacion_size): #por cada individuo de la poblacion
+        for i in range(self.population_size-1): #por cada individuo de la poblacion
             fitness = 0     #guardará la cantidad de pixeles similares al del objetivo
-            for j in range(self.genes_sizeY): #por cada fila de la matriz individuo 
-                for k in range(self.genes_sizeX): #por cada columna de la fila de la matriz del individuo
-                    if(not self.populationFitnesNoChange[i][j][k]): #si el individuo i de la poblacion en su lista de no cambiar en la pocisión [j][k] es falso, se permite preguntar, sino ya se sabe que es bueno el pixel
-                        if(self.population[i][j][k] == self.objective[j][k]):   #si el individuo i en la posicion [j][k] tiene el mismo pixel que el objetivo en la posición [j][k] siga
+            for j in range(self.genes_sizeX-1): #por cada fila de la matriz individuo 
+                for k in range(self.genes_sizeY-1): #por cada columna de la fila de la matriz del individuo
+                    if(not self.populationFitnessNoChange[i][j][k]): #si el individuo i de la poblacion en su lista de no cambiar en la pocisión [j][k] es falso, se permite preguntar, sino ya se sabe que es bueno el pixel
+                        if((self.population[i][j][k] == self.objective[j][k]).all()):   #si el individuo i en la posicion [j][k] tiene el mismo pixel que el objetivo en la posición [j][k] siga
                             fitness += 1   #se le suma un 1 al fitness
-                            self.populationFitnesNoChange[i][j][k] = True   #se cambia el estado de false a true para que no se vueva a cambiar
+                            print("entro 1")
+                            self.populationFitnessNoChange[i][j][k] = True   #se cambia el estado de false a true para que no se vueva a cambiar
                     else:
                         fitness += 1
-            self.populationFitness = (fitness/(self.genes_sizeX * self.genes_sizeY))*100 #se agrega el fitness del individuo
-
+                        print("entro 2")
+            self.populationFitness += [(fitness/(self.genes_sizeX * self.genes_sizeY))*100] #se agrega el fitness del individuo
                         
     #Agrega el fitnes de cada individuo evaluandolo con el objetivo
     def fitness_calculation(self):  #esta se usará para el fitnes cuando la opcion no change esté en true
-        for i in range(self.poblacion_size): #por cada individuo de la poblacion
+        for i in range(self.population_size): #por cada individuo de la poblacion
             fitness = 0     #guardará la cantidad de pixeles similares al del objetivo
             for j in range(self.genes_sizeY): #por cada fila de la matriz individuo 
                 for k in range(self.genes_sizeX): #por cada columna de la fila de la matriz del individuo
-                    if(self.population[i][j][k] == self.objective[j][k]):   #si el individuo i en la posicion [j][k] tiene el mismo pixel que el objetivo en la posición [j][k] siga
+                    if((self.population[i][j][k] == self.objective[j][k]).all()):   #si el individuo i en la posicion [j][k] tiene el mismo pixel que el objetivo en la posición [j][k] siga
                         fitness += 1   #se le suma un 1 al fitness
-            self.populationFitness += (fitness/(self.genes_sizeX * self.genes_sizeY))*100 #se agrega el fitness del individuo a populationFitness en la posicion i
+            self.populationFitness += [(fitness/(self.genes_sizeX * self.genes_sizeY))*100] #se agrega el fitness del individuo a populationFitness en la posicion i
 
 
     def select_parents(self):
@@ -166,7 +167,7 @@ class GeneticAlgorithm:
         new_generation = []
         parents = self.select_parents()
         best = self.population[self.alpha_male]
-        for _ in range(self.poblacion_size):
+        for _ in range(self.population_size):
             mutation = random.randint(0, 100 - 1) #indica un numero aleatorio del 0 al 100 para definir la mutacion
             parent2 = random.randint(0, len(parents) - 1) #numero aleatorio del padre 2
             child = []
@@ -174,9 +175,9 @@ class GeneticAlgorithm:
                 if(mutation >= (100 - self.mutation_percent)):
                     #aca lo que hace es que crea un hijo con el alfa y con el padre 2 que saca de la lista de los mejores padres segun el numero aleatorio,
                     #le envia la matriz de genes de ambos padres y la matris de genes que cambian o no del alfa y del padre 2
-                    child = self.crossoverIfMuteNoChange(self.population[self.alpha_male], self.population[parents[parent2]], self.populationFitnesNoChange[self.alpha_male], self.populationFitnesNoChange[parents[parent2]])
+                    child = self.crossoverIfMuteNoChange(self.population[self.alpha_male], self.population[parents[parent2]], self.populationFitnessNoChange[self.alpha_male], self.populationFitnessNoChange[parents[parent2]])
                 else:
-                    child = self.crossoverNoChange(self.population[self.alpha_male], self.population[parents[parent2]], self.populationFitnesNoChange[self.alpha_male])
+                    child = self.crossoverNoChange(self.population[self.alpha_male], self.population[parents[parent2]], self.populationFitnessNoChange[self.alpha_male])
             else:
                 if(mutation >= (100 - self.mutation_percent)): #si muta
                     mutation2 = random.randint(0, 2 - 1) #buscamos cual metodo de mutacion
@@ -197,9 +198,9 @@ class GeneticAlgorithm:
                         if(mutation >= (100 - self.mutation_percent)):
                             #aca lo que hace es que crea un hijo con el alfa y con el padre 2 que saca de la lista de los mejores padres segun el numero aleatorio,
                             #le envia la matriz de genes de ambos padres y la matris de genes que cambian o no del alfa y del padre 2
-                            child = self.crossoverIfMuteNoChange(self.population[self.alpha_male], self.population[parents[parent3]], self.populationFitnesNoChange[self.alpha_male], self.populationFitnesNoChange[parents[parent3]])
+                            child = self.crossoverIfMuteNoChange(self.population[self.alpha_male], self.population[parents[parent3]], self.populationFitnessNoChange[self.alpha_male], self.populationFitnessNoChange[parents[parent3]])
                         else:
-                            child = self.crossoverNoChange(self.population[self.alpha_male], child, self.populationFitnesNoChange[self.alpha_male])
+                            child = self.crossoverNoChange(self.population[self.alpha_male], child, self.populationFitnessNoChange[self.alpha_male])
                     else:
                         if(mutation >= (100 - self.mutation_percent)): #si muta
                             mutation2 = random.randint(0, 2 - 1) #buscamos cual metodo de mutacion
@@ -217,7 +218,7 @@ class GeneticAlgorithm:
         self.population = new_generation
         self.populationFitness = []
         if(self.noChange):
-            self.populationFitnesNoChange = self.create_false_matriz()
+            self.populationFitnessNoChange = self.create_false_matriz()
         self.generation += 1
         return best
 
@@ -231,8 +232,8 @@ class GeneticAlgorithm:
             self.best += [self.evolve()]
 
     def obtain_best_individuals(self, array_ind, ammount_best):
-        if not array_ind or ammount_best == 0:
-            return []
+        # if not array_ind or ammount_best == 0:
+        #     return []
         res = []
         for i, value in enumerate(array_ind):
             for j in range(len(res)):
@@ -250,3 +251,4 @@ class GeneticAlgorithm:
             result += [matriz]
         return result
     
+

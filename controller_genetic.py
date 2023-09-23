@@ -21,8 +21,3 @@ class ControllerGenetic():
         self.image_processor.process_image(self.artistic_image)
 
         self.pixels_image = self.image_processor.decompose_image()
-
-        print(self.pixels_image)
-        print(len(self.pixels_image))
-
-        self.artistic_image.show()
