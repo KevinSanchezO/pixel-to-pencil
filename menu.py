@@ -151,9 +151,6 @@ class Menu(tk.Frame):
             self.objective_image_label.configure(image=photo_objective)
             self.objective_image_label.image = photo_objective
 
-            # self.current_individual_image_label.configure(image=photo_objective)
-            # self.current_individual_image_label.image = photo_objective
-
     def set_parameters_algorithm(self):
         population = int(self.entry_population.get())    #se selecciona de la pantalla  [x]
         image_objective = self.controller_genetic.pixels_image #es automática
@@ -166,8 +163,6 @@ class Menu(tk.Frame):
         crossover_num = int(self.entry_crossover.get()) #se selecciona de la pantalla [x]
         color_obtainer = ColorObtainer()    #se crea automaticamente con la imagen 
         color_pallete = color_obtainer.generate_color_array(self.controller_genetic.artistic_image)
-        #print(color_pallete) 
-        #color_pallete2 = [sublist[:-1] for sublist in color_pallete] #se crea automaticamente
         with_pallete = self.pallete_entry_var.get()  #se selecciona de la pantalla [x]
         
         algorithm = GeneticAlgorithm(population, x, y, image_objective, noChange, parents, max_generaion, mutation, crossover_num, color_pallete, with_pallete, self.queue)
@@ -184,12 +179,10 @@ class Menu(tk.Frame):
         print(self.entry_mutation_percent.get())
         print(self.entry_crossover.get())
         print(self.pallete_entry_var.get())
-
         print("entra")
         self.thread1 = threading.Thread(target=self.geneticA.execute_genetic_algorithm)
         self.thread1.daemon = True
         self.thread1.start()
-
         self.update_gui()
 
     def update_gui(self):
@@ -197,25 +190,18 @@ class Menu(tk.Frame):
             parameter_values = self.queue.get()
             nuevo_texto_fitness = f"Mejor Fitness: {parameter_values['fitness'][-1]}"
             nuevo_texto_gen = f"Generacion actual: {parameter_values['gen_actual']}"
-            
             imagen_individuo = None
             if (parameter_values['gen_actual'] < 3):
                 imagen_individuo=self.image_processor.convert_array_image(parameter_values['mejor_individuo'][-1])
             else:
                 imagen_individuo=self.image_processor.convert_list_image(parameter_values['mejor_individuo'][-1])
-
-            #print(nuevo_texto_gen)
-            #print(nuevo_texto_fitness)
             imagen_mejor_actual = imagen_individuo.resize((300, 300), Image.LANCZOS)
             photo_individuo = ImageTk.PhotoImage(imagen_mejor_actual)
-
             # Actualiza el texto del label en el hilo principal utilizando configure
             self.label_fitness.configure(text=nuevo_texto_fitness)
             self.label_gen.configure(text=nuevo_texto_gen)
-
             self.current_individual_image_label.configure(image=photo_individuo)
             self.current_individual_image_label.image = photo_individuo
-            
         self.root.after(100, self.update_gui)
 
 

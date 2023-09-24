@@ -1,6 +1,7 @@
 import random
 from genetic import Genetic
 import numpy as np
+import time
 
 class GeneticAlgorithm:
     def __init__(self, population_size, genes_sizeX, genes_sizeY, objective, noChange, parents, max_generation, mutation, crossover_num, color_obtainer, with_pallete, queue):
@@ -280,6 +281,7 @@ class GeneticAlgorithm:
              self.queue.put(atributes)
              if(self.bestFitness[-1] >= 100):
                  return
+             time.sleep(1)
 
     def obtain_best_individuals(self, array_ind, ammount_best):
         # if not array_ind or ammount_best == 0:
