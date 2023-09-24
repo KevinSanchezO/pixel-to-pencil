@@ -22,6 +22,25 @@ class Genetic():
         self.image_processor.process_image(pixels_image)
         return self.image_processor.decompose_image()
     
+    def draw_image_pallete(self, yParam, xParam, pallete):
+        imagen = Image.new("RGB", (yParam, xParam))
+
+        # Crea un objeto ImageDraw para dibujar en la imagen
+        draw = ImageDraw.Draw(imagen)
+
+        # Llena la imagen con colores aleatorios
+        for x in range(yParam):
+            for y in range(xParam):
+                colorBest = random.choice(pallete)
+                color = (colorBest[0], colorBest[1], colorBest[2])
+                draw.point((x, y), fill=color)
+        pixels_image = imagen
+
+        self.image_processor.process_image(pixels_image)
+        return self.image_processor.decompose_image()
+    
+
+
     #Dibuja una imagen completamente en blanco
     def draw_blank_image(self, yParam, xParam):
         imagen= Image.new("RGB", (yParam, xParam), (255, 255, 255))
