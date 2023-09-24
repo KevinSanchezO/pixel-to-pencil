@@ -15,7 +15,7 @@ class Main(tk.Tk):
         super().__init__()
 
         # Set the geometry of the main window
-        self.geometry("1280x720")
+        self.geometry("1280x820")
 
         self.title("Pixel to Pencil")
 

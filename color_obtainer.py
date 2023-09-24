@@ -7,6 +7,7 @@ class ColorObtainer():
         self.color_array = None
 
     def generate_color_array(self, image):
+        
         self.image = image
         pixel_values = np.array(self.image)
         height, width, _ = pixel_values.shape

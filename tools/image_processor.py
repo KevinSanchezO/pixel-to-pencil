@@ -29,6 +29,7 @@ class ImageProcessor():
             (width, height),
             Image.NEAREST
         )
+        result_image = result_image.convert('RGB')
         return result_image
     
     def convert_array_image(self, rgb_array):
