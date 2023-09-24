@@ -28,7 +28,7 @@ class Main(tk.Tk):
         }
 
         for name, F in self.frames.items():
-            frame = F(self.container, self)
+            frame = F(self.container, self, self)
             self.frames[name] = frame
             frame.grid(row=1, column=0, sticky="nsew")
 

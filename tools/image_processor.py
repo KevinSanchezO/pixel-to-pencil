@@ -1,5 +1,6 @@
 from PIL import Image
 import numpy as np
+import re
 
 class ImageProcessor():
     def __init__(self):
@@ -32,6 +33,22 @@ class ImageProcessor():
         result_image = result_image.convert('RGB')
         return result_image
     
+    def convert_list_image(self, rgb_list):
+        height = len(rgb_list)
+        width = len(rgb_list[0])
+
+        # Convertir la lista de píxeles en un array NumPy
+        rgb_array = np.array(rgb_list, dtype=np.uint8)
+
+        # Asegurar que el array tiene el formato adecuado (alto x ancho x 3 para una imagen en RGB)
+        expected_shape = (height, width, 3)
+        if rgb_array.shape != expected_shape:
+            raise ValueError(f"El formato del array no es compatible con una imagen RGB de {expected_shape} píxeles")
+
+        # Crear la imagen a partir del array
+        imagen = Image.fromarray(rgb_array)
+        return imagen
+
     def convert_array_image(self, rgb_array):
         imagen = Image.fromarray(rgb_array)
         return imagen

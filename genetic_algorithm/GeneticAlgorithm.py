@@ -3,7 +3,7 @@ from genetic import Genetic
 import numpy as np
 
 class GeneticAlgorithm:
-    def __init__(self, population_size, genes_sizeX, genes_sizeY, objective, noChange, parents, max_generation, mutation, crossover_num, color_obtainer, with_pallete):
+    def __init__(self, population_size, genes_sizeX, genes_sizeY, objective, noChange, parents, max_generation, mutation, crossover_num, color_obtainer, with_pallete, queue):
         self.first_gen = Genetic()             #esta clase se encarga de procesar las imagenes random iniciales
         self.color_obtainer = color_obtainer   #paleta de colores
         self.withPallete = with_pallete        #permite usar o no la paleta de colores de la imagen
@@ -23,6 +23,7 @@ class GeneticAlgorithm:
         self.crossovernum = crossover_num      #indica la cantidad de individuos que se cruzan
         self.best = []                         #mejor individuo de cada generacion, imagen
         self.bestFitness = []                  #fitness del mejor de cada generacion, cada uno de acuerdo al indice de best
+        self.queue = queue
 
     #Funcion encargada de inicializar las poblaciones en imagenes random e imagenes blancas
     def population_init(self):
@@ -270,7 +271,13 @@ class GeneticAlgorithm:
              else:
                  self.fitness_calculation()
              self.evolve()
+             
+             print(self.generation)
              print(self.bestFitness[-1])
+
+             atributes = {'gen_actual': self.generation, 'fitness': self.bestFitness, "mejor_individuo": self.best}
+
+             self.queue.put(atributes)
              if(self.bestFitness[-1] >= 100):
                  return
 
