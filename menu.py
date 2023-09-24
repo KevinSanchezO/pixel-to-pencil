@@ -3,6 +3,7 @@ import customtkinter as ctk
 from tkinter import filedialog
 from PIL import Image, ImageTk, ImageDraw
 import random
+import re
 
 from controller_genetic import ControllerGenetic
 from genetic import Genetic
@@ -41,15 +42,16 @@ class Menu(tk.Frame):
         self.entry_generations = ctk.CTkEntry(self, width=150, height=30, font=font_frame, border_width=2)
         self.entry_generations.focus()
         self.entry_generations.place(x=540+40, y=50)
-
+        self.entry_generations.configure(validate="key", validatecommand=(self.register(self.validate_int), "%P"))
 
         #Poblations input
         label_poblations = ctk.CTkLabel(self, text="Tamaño de poblaciones", fg_color="transparent", font=font_frame, text_color="white")
         label_poblations.place(x=520+40, y= 90)
 
-        self.entry_poblations = ctk.CTkEntry(self, width=150, height=30, font=font_frame, border_width=2)
-        self.entry_poblations.focus()
-        self.entry_poblations.place(x=540+40, y=120) 
+        self.entry_population = ctk.CTkEntry(self, width=150, height=30, font=font_frame, border_width=2)
+        self.entry_population.focus()
+        self.entry_population.place(x=540+40, y=120) 
+        self.entry_population.configure(validate="key", validatecommand=(self.register(self.validate_int), "%P"))
 
 
         #Parents input
@@ -59,6 +61,7 @@ class Menu(tk.Frame):
         self.entry_parents = ctk.CTkEntry(self, width=150, height=30, font=font_frame, border_width=2)
         self.entry_parents.focus()
         self.entry_parents.place(x=540+40, y=190)
+        self.entry_parents.configure(validate="key", validatecommand=(self.register(self.validate_int), "%P"))
 
 
         #Mutation percent input
@@ -68,7 +71,7 @@ class Menu(tk.Frame):
         self.entry_mutation_percent = ctk.CTkEntry(self, width=150, height=30, font=font_frame, border_width=2)
         self.entry_mutation_percent.focus()
         self.entry_mutation_percent.place(x=540+40, y=260)
-
+        self.entry_mutation_percent.configure(validate="key", validatecommand=(self.register(self.validate_int), "%P"))
 
         #Crossover input
         label_crossover = ctk.CTkLabel(self, text="Cantidad de cruces", fg_color="transparent", font=font_frame, text_color="white")
@@ -77,26 +80,23 @@ class Menu(tk.Frame):
         self.entry_crossover = ctk.CTkEntry(self, width=150, height=30, font=font_frame, border_width=2)
         self.entry_crossover.focus()
         self.entry_crossover.place(x=540+40, y=330)
-
+        self.entry_crossover.configure(validate="key", validatecommand=(self.register(self.validate_int), "%P"))
 
         #noChange input
-        self.no_entry_switch_var = ctk.BooleanVar(value=True)
-        switch_no_change = ctk.CTkSwitch(self, text="Permitir el cambio de los genes iguales al objetivo", variable=self.no_entry_switch_var, onvalue=True, offvalue=False)
+        self.no_change_entry_switch_var = ctk.BooleanVar(value=True)
+        switch_no_change = ctk.CTkSwitch(self, text="Permitir el cambio de los genes iguales al objetivo", variable=self.no_change_entry_switch_var, onvalue=True, offvalue=False)
         switch_no_change.place(x=450+40, y= 360)
 
 
         #withPallete input
-        self.no_entry_pallete_var = ctk.BooleanVar(value=True)
-        switch_pallete = ctk.CTkSwitch(self, text="Permitir usar la paleta de colores", variable=self.no_entry_pallete_var, onvalue=True, offvalue=False)
+        self.pallete_entry_var = ctk.BooleanVar(value=True)
+        switch_pallete = ctk.CTkSwitch(self, text="Permitir usar la paleta de colores", variable=self.pallete_entry_var, onvalue=True, offvalue=False)
         switch_pallete.place(x=450+40, y= 390)
 
 
         exec_button = ctk.CTkButton(self, text="Iniciar algoritmo",  command=self.hilo1, font=font_frame)
-        exec_button.place(x=540, y=550)
+        exec_button.place(x=540+40, y=350+80)
 
-        #Poblations fitness
-        self.label_fitness = ctk.CTkLabel(self, text="Mejor Fitness: ", fg_color="transparent", font=font_frame, text_color="white")
-        self.label_fitness.place(x=520, y= 350+80)
 
         label_objective = ctk.CTkLabel(self, text="Imagen objetivo", fg_color="transparent", font=font_frame, text_color="white")
         label_objective.place(x=780+120+90, y=20)
@@ -104,9 +104,29 @@ class Menu(tk.Frame):
         self.objective_image_label = tk.Label(self)
         self.objective_image_label.place(x=780+50+90,y=60)
 
+
+        # These widgets will display the data of the algorithm during excecution
+        # These widgets will display the data of the algorithm during excecution
+
+        label_current_individual = ctk.CTkLabel(self, text="Mejor individuo actual", fg_color="transparent", font=font_frame, text_color="white")
+        label_current_individual.place(x=990, y=360+20)
+
+        self.current_individual_image_label = tk.Label(self)
+        self.current_individual_image_label.place(x=920,y=390+20)
+
+
+        #Poblations fitness
+        self.label_fitness = ctk.CTkLabel(self, text="Mejor Fitness: 0", fg_color="transparent", font=font_frame, text_color="white")
+        self.label_fitness.place(x=540+40, y= 450+80)
+
+
         self.thread1 = threading.Thread(target=self.actualizar_texto_asincronamente)
         self.thread1.daemon = True
         self.thread1.start()
+
+    def validate_int(self, value):
+        # Utiliza una expresión regular para verificar si el valor es un entero
+        return re.match("^[0-9]*$", value) is not None
 
     def load_image(self):
         file_path = filedialog.askopenfilename(filetypes=[("", "*.png;*.jpg;*.jpeg;*.gif")])
@@ -127,21 +147,24 @@ class Menu(tk.Frame):
             self.objective_image_label.configure(image=photo_objective)
             self.objective_image_label.image = photo_objective
 
+            # self.current_individual_image_label.configure(image=photo_objective)
+            # self.current_individual_image_label.image = photo_objective
+
     def start_algorithm(self):
-        population = 100    #se selecciona de la pantalla  [x]
+        population = int(self.entry_population.get())    #se selecciona de la pantalla  [x]
         image_objective = self.controller_genetic.pixels_image #es automática
         y = len(image_objective)      #es automatico de la imagen
         x = len(image_objective[0])     #es automatico de la imagen
-        noChange = True                    #se selecciona de la pantalla [x]
-        parents = 25                        #se selecciona de la pantalla [x]
-        max_generaion = 300                 #se selecciona de la pantalla [x]
-        mutation = 100                      #se selecciona de la pantalla de 0 a 100 [x]
-        crossover_num = 2                   #se selecciona de la pantalla [x]
+        noChange = self.no_change_entry_switch_var.get() #se selecciona de la pantalla [x]
+        parents = int(self.entry_parents.get()) #se selecciona de la pantalla [x]
+        max_generaion = int(self.entry_generations.get()) #se selecciona de la pantalla [x]
+        mutation = int(self.entry_mutation_percent.get()) #se selecciona de la pantalla de 0 a 100 [x]
+        crossover_num = int(self.entry_crossover.get()) #se selecciona de la pantalla [x]
         color_obtainer = ColorObtainer()    #se crea automaticamente con la imagen 
         color_pallete = color_obtainer.generate_color_array(self.controller_genetic.artistic_image)
         #print(color_pallete) 
         #color_pallete2 = [sublist[:-1] for sublist in color_pallete] #se crea automaticamente
-        with_pallete = True  #se selecciona de la pantalla []
+        with_pallete = self.pallete_entry_var.get()  #se selecciona de la pantalla [x]
         
         algorithm = GeneticAlgorithm(population, x, y, image_objective, noChange, parents, max_generaion, mutation, crossover_num, color_pallete, with_pallete)
         self.geneticA = algorithm
@@ -149,6 +172,14 @@ class Menu(tk.Frame):
 
     def iniciar_algoritmo(self):
     # Coloca aquí la lógica de tu algoritmo
+        print(self.entry_population.get())
+        print(self.no_change_entry_switch_var.get())
+        print(self.entry_parents.get())
+        print(self.entry_generations.get())
+        print(self.entry_mutation_percent.get())
+        print(self.entry_crossover.get())
+        print(self.pallete_entry_var.get())
+
         print("entra")
         self.start_algorithm()
         self.geneticA.execute_genetic_algorithm()
@@ -166,7 +197,7 @@ class Menu(tk.Frame):
         while True:
             time.sleep(1)  # Espera 1 segundo (en otro hilo)
             contador += 1
-            nuevo_texto = f"BestFitness: {contador}"  #bestFitness[-1] dl algoritmo genético, la imagen está en best[-1]
+            nuevo_texto = f"Mejor Fitness: {self.geneticA.bestFitness[-1]}"  #bestFitness[-1] dl algoritmo genético, la imagen está en best[-1]
 
             # Actualiza el texto del label en el hilo principal utilizando configure
             self.label_fitness.configure(text=nuevo_texto)
