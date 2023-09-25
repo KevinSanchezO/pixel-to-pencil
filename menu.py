@@ -26,6 +26,7 @@ class Menu(tk.Frame):
         self.geneticA = None
         self.queue = Queue()
         self.image_processor = ImageProcessor()
+        self.file_path = None
 
         label1 = tk.Label(self, text="").grid(row=0, column=0,padx=1000,pady=1000)
 
@@ -103,6 +104,12 @@ class Menu(tk.Frame):
         exec_button.place(x=540+40, y=350+80)
 
 
+        #drop down menu to select the art filter of the image
+        self.filter = ctk.StringVar(value="Pixel-art")
+        self.option_menu = ctk.CTkOptionMenu(self, values=["Pixel-art", "Entintado"], command=self.change_filter, variable=self.filter)
+        self.option_menu.place(x=20+70, y=350+80)
+
+
         label_objective = ctk.CTkLabel(self, text="Imagen objetivo", fg_color="transparent", font=font_frame, text_color="white")
         label_objective.place(x=780+120+90, y=20)
 
@@ -128,6 +135,9 @@ class Menu(tk.Frame):
         self.label_gen = ctk.CTkLabel(self, text="Generacion actual: 0", fg_color="transparent", font=font_frame, text_color="white")
         self.label_gen.place(x=20+50, y= 450+80+30)
 
+    def change_filter(self, *args):
+        self.apply_filter()
+
     def validate_int(self, value):
         # Utiliza una expresión regular para verificar si el valor es un entero
         return re.match("^[0-9]*$", value) is not None
@@ -135,21 +145,29 @@ class Menu(tk.Frame):
     def load_image(self):
         file_path = filedialog.askopenfilename(filetypes=[("", "*.png;*.jpg;*.jpeg;*.gif")])
         if file_path:
-            imported_image = Image.open(file_path)
-            image = imported_image.resize((300, 300), Image.LANCZOS)
-            photo = ImageTk.PhotoImage(image)
+            self.file_path = file_path
+            self.apply_filter()
 
-            # Update the label to display the loaded image
-            self.image_label.configure(image=photo)
-            self.image_label.image = photo
+    def apply_filter(self):
+        imported_image = Image.open(self.file_path)
+        image = imported_image.resize((300, 300), Image.LANCZOS)
+        photo = ImageTk.PhotoImage(image)
 
+        # Update the label to display the loaded image
+        self.image_label.configure(image=photo)
+        self.image_label.image = photo
+
+        if (self.filter.get() == "Pixel-art"):
             self.controller_genetic.proccess_pixels(imported_image)
+        elif(self.filter.get() == "Entintado"):
+            self.controller_genetic.proccess_pixels_inked(self.file_path)
 
-            objective_image = self.controller_genetic.artistic_image.resize((300, 300), Image.LANCZOS)
-            photo_objective = ImageTk.PhotoImage(objective_image)
+        objective_image = self.controller_genetic.artistic_image.resize((300, 300), Image.LANCZOS)
+        photo_objective = ImageTk.PhotoImage(objective_image)
             
-            self.objective_image_label.configure(image=photo_objective)
-            self.objective_image_label.image = photo_objective
+        self.objective_image_label.configure(image=photo_objective)
+        self.objective_image_label.image = photo_objective
+        
 
     def set_parameters_algorithm(self):
         population = int(self.entry_population.get())    #se selecciona de la pantalla  [x]

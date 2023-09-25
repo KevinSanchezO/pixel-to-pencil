@@ -1,6 +1,7 @@
 from PIL import Image
 import numpy as np
 import re
+import cv2
 
 class ImageProcessor():
     def __init__(self):
@@ -32,6 +33,29 @@ class ImageProcessor():
         )
         result_image = result_image.convert('RGB')
         return result_image
+    
+    def inked(self, image):
+        img = cv2.imread(image)
+
+        # Convertir la imagen a escala de grises
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        # Aplicar un efecto de cómic a la imagen
+        edges = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                                    cv2.THRESH_BINARY, 9, 9)
+
+        color = cv2.bilateralFilter(img, 9, 300, 300)
+
+        cartoon = cv2.bitwise_and(color, color, mask=edges)
+
+        # Convertir la imagen resultante a formato RGB (necesario para Pillow)
+        cartoon_rgb = cv2.cvtColor(cartoon, cv2.COLOR_BGR2RGB)
+
+        # Crear una imagen PIL desde la matriz de píxeles
+        pil_image = Image.fromarray(cartoon_rgb)
+
+        return pil_image
+
     
     def convert_list_image(self, rgb_list):
         height = len(rgb_list)

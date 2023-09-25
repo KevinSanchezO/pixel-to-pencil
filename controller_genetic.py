@@ -16,8 +16,14 @@ class ControllerGenetic():
     def proccess_pixels(self, image):
         self.image = image
 
-        self.artistic_image = self.image_processor.pixelate(self.image, 4)
+        self.artistic_image = self.image_processor.pixelate(self.image, 8)
 
         self.image_processor.process_image(self.artistic_image)
 
+        self.pixels_image = self.image_processor.decompose_image()
+
+    def proccess_pixels_inked(self, image):
+        self.image = image
+        self.artistic_image = self.image_processor.inked(self.image)
+        self.image_processor.process_image(self.artistic_image)
         self.pixels_image = self.image_processor.decompose_image()
