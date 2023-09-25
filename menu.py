@@ -147,6 +147,8 @@ class Menu(tk.Frame):
         return re.match("^[0-9]*$", value) is not None
 
     def load_image(self):
+        self.reset_to_initial_state()
+
         file_path = filedialog.askopenfilename(filetypes=[("", "*.png;*.jpg;*.jpeg;*.gif")])
         if file_path:
             self.file_path = file_path
@@ -267,3 +269,18 @@ class Menu(tk.Frame):
 
         # El hilo ha terminado, asegúrate de restablecer el índice y limpiar la referencia al hilo
         self.image_update_thread = None
+
+    def reset_to_initial_state(self):
+        self.controller_genetic = ControllerGenetic()
+        self.first_gen = Genetic()
+        self.geneticA = None
+        self.queue = Queue()
+        self.image_processor = ImageProcessor()
+        self.file_path = None
+        self.geneticA = None
+        self.no_change_entry_switch_var.set(True)
+        self.pallete_entry_var.set(True)
+
+        self.label_fitness.configure(text="Mejor Fitness: 0")
+        self.label_gen.configure(text="Generacion actual: 0")
+        self.label_gen_repetition.configure(text="Generacion mostrada en la repeticion: 0")
