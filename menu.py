@@ -207,7 +207,7 @@ class Menu(tk.Frame):
         if not self.queue.empty():
             parameter_values = self.queue.get()
             nuevo_texto_fitness = f"Mejor Fitness: {parameter_values['fitness'][-1]}"
-            nuevo_texto_gen = f"Generacion actual: {parameter_values['gen_actual']}"
+            nuevo_texto_gen = f"Generacion actual: {parameter_values['gen_actual']-1}"
             imagen_individuo = None
             if (parameter_values['gen_actual'] < 3):
                 imagen_individuo=self.image_processor.convert_array_image(parameter_values['mejor_individuo'][-1])
