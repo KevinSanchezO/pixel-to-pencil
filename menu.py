@@ -135,6 +135,10 @@ class Menu(tk.Frame):
         self.label_gen = ctk.CTkLabel(self, text="Generacion actual: 0", fg_color="transparent", font=font_frame, text_color="white")
         self.label_gen.place(x=20+50, y= 450+80+30)
 
+        #Represents the current gen in repetition
+        self.label_gen_repetition = ctk.CTkLabel(self, text="Generacion mostrada en la repeticion: 0", fg_color="transparent", font=font_frame, text_color="white")
+        self.label_gen_repetition.place(x=920, y=780)
+
     def change_filter(self, *args):
         self.apply_filter()
 
@@ -215,36 +219,51 @@ class Menu(tk.Frame):
                 imagen_individuo=self.image_processor.convert_list_image(parameter_values['mejor_individuo'][-1])
             imagen_mejor_actual = imagen_individuo.resize((300, 300), Image.LANCZOS)
             photo_individuo = ImageTk.PhotoImage(imagen_mejor_actual)
+
             # Actualiza el texto del label en el hilo principal utilizando configure
             self.label_fitness.configure(text=nuevo_texto_fitness)
             self.label_gen.configure(text=nuevo_texto_gen)
             self.current_individual_image_label.configure(image=photo_individuo)
             self.current_individual_image_label.image = photo_individuo
+
+            if (parameter_values['gen_actual'] > int(self.entry_generations.get())):
+                self.start_image_update_thread(parameter_values['mejor_individuo'])
+
         self.root.after(100, self.update_gui)
 
+    def start_image_update_thread(self, images):
+        # Función para iniciar un hilo que mostrará las imágenes cada segundo
+        self.image_update_thread = threading.Thread(target=self.update_image_thread, args=(images,))
+        self.image_update_thread.start()
 
-# # Función para configurar el evento del botón
-#     def hilo1(self):
-#     # Crea un nuevo hilo y configura la función a ejecutar en ese hilo
-#         thread = threading.Thread(target=self.iniciar_algoritmo)
-#     # Inicia el hilo
-#         thread.start()
-        
+    def update_image_thread(self, images):
+        current_image_index = 0
 
-    # def actualizar_texto_asincronamente(self):
-    #     contador = 0
-    #     while True:
-    #         time.sleep(1)  # Espera 1 segundo (en otro hilo)
-    #         contador += 1
-    #         nuevo_texto = f"Mejor Fitness: {self.geneticA.bestFitness[-1]}"  #bestFitness[-1] dl algoritmo genético, la imagen está en best[-1]
+        # Función que se ejecutará en el hilo para mostrar imágenes cada segundo
+        while current_image_index < len(images):
+            image_data = images[current_image_index]
 
-    #         # Actualiza el texto del label en el hilo principal utilizando configure
-    #         self.label_fitness.configure(text=nuevo_texto)
+            imagen_individuo = None
+            if (current_image_index == 0):
+                imagen_individuo=self.image_processor.convert_array_image(image_data)
+            else:
+                imagen_individuo=self.image_processor.convert_list_image(image_data)
 
-#print(parameter_values['mejor_individuo'][-1])
-            #print(type(parameter_values['mejor_individuo'][-1]))
-            # print(len(parameter_values['mejor_individuo'][-1]))
-            # print(len(parameter_values['mejor_individuo'][-1][0]))
-            # print(len(parameter_values['mejor_individuo'][-1][0][0]))
-            # print("=================")
-            #print(parameter_values['gen_actual']) self.image_processor.convert_array_image(parameter_values['mejor_individuo'][-1])
+            
+            imagen_mejor_actual = imagen_individuo.resize((300, 300), Image.LANCZOS)
+            photo_individuo = ImageTk.PhotoImage(imagen_mejor_actual)
+
+            # Actualiza la imagen en la etiqueta
+            self.current_individual_image_label.configure(image=photo_individuo)
+            self.current_individual_image_label.image = photo_individuo
+
+            # Incrementa el índice para la próxima imagen
+            current_image_index += 1
+            nuevo_texto_gen = f"Generacion mostrada en la repeticion: {current_image_index}"
+            self.label_gen_repetition.configure(text=nuevo_texto_gen)
+
+            # Espera 1 segundo antes de mostrar la próxima imagen
+            time.sleep(1)
+
+        # El hilo ha terminado, asegúrate de restablecer el índice y limpiar la referencia al hilo
+        self.image_update_thread = None

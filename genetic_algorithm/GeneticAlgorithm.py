@@ -283,6 +283,7 @@ class GeneticAlgorithm:
                  return
              time.sleep(1)
 
+
     def obtain_best_individuals(self, array_ind, ammount_best):
         # if not array_ind or ammount_best == 0:
         #     return []
