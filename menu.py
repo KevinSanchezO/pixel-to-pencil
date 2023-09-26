@@ -258,7 +258,7 @@ class Menu(tk.Frame):
             self.current_individual_image_label.configure(image=photo_individuo)
             self.current_individual_image_label.image = photo_individuo
 
-            if (parameter_values['gen_actual'] > self.geneticA.max_generation):
+            if (parameter_values['gen_actual'] > self.geneticA.max_generation or self.geneticA.completed):
                 self.start_image_update_thread(parameter_values['mejor_individuo'])
 
         self.root.after(100, self.update_gui)

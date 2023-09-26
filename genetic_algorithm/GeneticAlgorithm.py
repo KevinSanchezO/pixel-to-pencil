@@ -28,6 +28,7 @@ class GeneticAlgorithm:
         self.bestFitness = []                  #fitness del mejor de cada generacion, cada uno de acuerdo al indice de best
         self.queue = queue                     #Queue de tareas para poder ser utilizadas en el hilo de la interfaz
         self.average_fitness = []              #Lista del promedio de fitness de cada generacion
+        self.completed = False
 
     #Funcion encargada de inicializar las poblaciones en imagenes random e imagenes blancas
     def population_init(self):
@@ -267,6 +268,7 @@ class GeneticAlgorithm:
 
              self.queue.put(atributes)
              if(self.bestFitness[-1] >= 100):
+                 self.completed = True
                  return
              time.sleep(1)
 
