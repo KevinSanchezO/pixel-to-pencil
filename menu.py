@@ -4,6 +4,9 @@ from tkinter import filedialog
 from PIL import Image, ImageTk, ImageDraw
 import random
 import re
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.pyplot as plt
+import io
 
 from controller_genetic import ControllerGenetic
 from genetic import Genetic
@@ -27,6 +30,14 @@ class Menu(tk.Frame):
         self.queue = Queue()
         self.image_processor = ImageProcessor()
         self.file_path = None
+
+        fig = plt.figure()
+        fig.subplots_adjust(left=0.1, right=0.9, bottom=0.1, top=0.9)
+        fig.set_size_inches(5, 3)
+        fig.add_subplot(111)
+        self.canvas = FigureCanvasTkAgg(fig, self)
+        self.canvas.get_tk_widget().pack()
+        self.canvas.get_tk_widget().place(x=350, y=500)
 
         label1 = tk.Label(self, text="").grid(row=0, column=0,padx=1000,pady=1000)
 
@@ -195,7 +206,6 @@ class Menu(tk.Frame):
         self.iniciar_algoritmo()
 
     def iniciar_algoritmo(self):
-    # Coloca aquí la lógica de tu algoritmo
         print(self.entry_population.get())
         print(self.no_change_entry_switch_var.get())
         print(self.entry_parents.get())
@@ -203,6 +213,11 @@ class Menu(tk.Frame):
         print(self.entry_mutation_percent.get())
         print(self.entry_crossover.get())
         print(self.pallete_entry_var.get())
+
+        self.label_fitness.configure(text="Mejor Fitness: 0")
+        self.label_gen.configure(text="Generacion actual: 0")
+        self.label_gen_repetition.configure(text="Generacion mostrada en la repeticion: 0")
+
         print("entra")
         self.thread1 = threading.Thread(target=self.geneticA.execute_genetic_algorithm)
         self.thread1.daemon = True
@@ -222,13 +237,28 @@ class Menu(tk.Frame):
             imagen_mejor_actual = imagen_individuo.resize((300, 300), Image.LANCZOS)
             photo_individuo = ImageTk.PhotoImage(imagen_mejor_actual)
 
+            buffer = parameter_values["grafico"]
+            fig = plt.figure()
+            fig.subplots_adjust(left=0.1, right=0.9, bottom=0.1, top=0.9)
+            fig.set_size_inches(5, 3)
+            fig.add_subplot(111)
+            fig.figimage(plt.imread(buffer), 10, 10, zorder=10)
+
+            # Establecer la nueva imagen en el widget de lienzo
+            self.canvas.figure = fig
+            self.canvas.draw()
+
+            # Posicionar la imagen utilizando el método place
+            self.canvas.get_tk_widget().place(x=350, y=500)
+
+
             # Actualiza el texto del label en el hilo principal utilizando configure
             self.label_fitness.configure(text=nuevo_texto_fitness)
             self.label_gen.configure(text=nuevo_texto_gen)
             self.current_individual_image_label.configure(image=photo_individuo)
             self.current_individual_image_label.image = photo_individuo
 
-            if (parameter_values['gen_actual'] > int(self.entry_generations.get())):
+            if (parameter_values['gen_actual'] > self.geneticA.max_generation):
                 self.start_image_update_thread(parameter_values['mejor_individuo'])
 
         self.root.after(100, self.update_gui)
@@ -264,10 +294,9 @@ class Menu(tk.Frame):
             nuevo_texto_gen = f"Generacion mostrada en la repeticion: {current_image_index}"
             self.label_gen_repetition.configure(text=nuevo_texto_gen)
 
-            # Espera 1 segundo antes de mostrar la próxima imagen
             time.sleep(1)
 
-        # El hilo ha terminado, asegúrate de restablecer el índice y limpiar la referencia al hilo
+        # El hilo ha terminado
         self.image_update_thread = None
 
     def reset_to_initial_state(self):

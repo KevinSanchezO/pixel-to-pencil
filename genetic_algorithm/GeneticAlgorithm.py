@@ -2,6 +2,8 @@ import random
 from genetic import Genetic
 import numpy as np
 import time
+import matplotlib.pyplot as plt
+import io
 
 class GeneticAlgorithm:
     def __init__(self, population_size, genes_sizeX, genes_sizeY, objective, noChange, parents, max_generation, mutation, crossover_num, color_obtainer, with_pallete, queue):
@@ -24,7 +26,8 @@ class GeneticAlgorithm:
         self.crossovernum = crossover_num      #indica la cantidad de individuos que se cruzan
         self.best = []                         #mejor individuo de cada generacion, imagen
         self.bestFitness = []                  #fitness del mejor de cada generacion, cada uno de acuerdo al indice de best
-        self.queue = queue
+        self.queue = queue                     #Queue de tareas para poder ser utilizadas en el hilo de la interfaz
+        self.average_fitness = []              #Lista del promedio de fitness de cada generacion
 
     #Funcion encargada de inicializar las poblaciones en imagenes random e imagenes blancas
     def population_init(self):
@@ -40,26 +43,6 @@ class GeneticAlgorithm:
                 self.population += [self.first_gen.draw_image(self.genes_sizeX, self.genes_sizeY)]
         if(self.noChange):
             self.populationFitnessNoChange = self.create_false_matriz()
-        # # print("popfitnchange, pfncf, pfncc:")
-
-        # # print(self.population_size)
-        # # print(len(self.populationFitnessNoChange))
-        # # print(len(self.populationFitnessNoChange[0])) #66
-        # # print(len(self.populationFitnessNoChange[0][0])) #120
-
-        # # # print("population, pfilas, pcolumn:")
-        # # print(len(self.population))
-        # print(len(self.population[0])) #66
-        # print(len(self.population[0][0])) #220
-        # print("pppppppppppppppppppppppppp")
-        # print(len(self.population[10])) #66
-        # print(len(self.population[10][0])) #220
-        # # print(len(self.objective))
-        # # print(len(self.objective[0]))
-
-
-
-
 
     #Agrega el fitnes de cada individuo evaluandolo con el objetivo, tiene en cuenta si se quiere cambiar o no el pixel
     def fitness_calculation_No_Change(self):  #esta se usará para el fitnes cuando la opcion no change esté en true
@@ -73,7 +56,6 @@ class GeneticAlgorithm:
                             self.populationFitnessNoChange[i][j][k] = True   #se cambia el estado de false a true para que no se vueva a cambiar
                     else:
                         fitness += 1
-                        #print("entro 2")
             self.populationFitness += [(fitness/(self.genes_sizeX * self.genes_sizeY))*100] #se agrega el fitness del individuo
                         
     #Agrega el fitnes de cada individuo evaluandolo con el objetivo
@@ -91,7 +73,6 @@ class GeneticAlgorithm:
         best_individuals = self.obtain_best_individuals(self.populationFitness, self.parents)
         self.alpha_male = best_individuals[0] #me da la posición cero de los mejores individuos, osea el mayor de los fitness
         return best_individuals[1:]
-        #numero_aleatorio = random.randint(0, len(best_individuals) - 1)
 
     #Cruza de forma random los genes //aqui no aplica el nochange
     def crossoverRow(self, parent1, parent2):
@@ -207,7 +188,11 @@ class GeneticAlgorithm:
         new_generation = []
         parents = self.select_parents()
         best = self.population[self.alpha_male]
-        bestFit = self.populationFitness[self.alpha_male]
+        bestFit = round(self.populationFitness[self.alpha_male], 5)
+        
+        average = sum(self.populationFitness)
+        self.average_fitness += [average / len(self.populationFitness)]
+        
         for _ in range(self.population_size):
             mutation = random.randint(0, 100 - 1) #indica un numero aleatorio del 0 al 100 para definir la mutacion
             parent2 = random.randint(0, len(parents) - 1) #numero aleatorio del padre 2
@@ -276,13 +261,48 @@ class GeneticAlgorithm:
              print(self.generation)
              print(self.bestFitness[-1])
 
-             atributes = {'gen_actual': self.generation, 'fitness': self.bestFitness, "mejor_individuo": self.best}
+             graphic_image = self.generate_graphic()
+
+             atributes = {'gen_actual': self.generation, 'fitness': self.bestFitness, "mejor_individuo": self.best, 'grafico': graphic_image}
 
              self.queue.put(atributes)
              if(self.bestFitness[-1] >= 100):
                  return
              time.sleep(1)
 
+
+    def generate_graphic(self):
+        fig, ax = plt.subplots(figsize=(5, 3))
+        ancho_barras = 0.10
+        
+        x = range(len(self.average_fitness))
+        ax.bar(x, self.average_fitness, width=ancho_barras, label='Promedio', align='center')
+        
+        x_mejores = [i + ancho_barras for i in x]
+        ax.bar(x_mejores, self.bestFitness, width=ancho_barras, label='Mejor Porcentaje', align='center')
+
+        ax.set_xticks([i + ancho_barras / 2 for i in x])
+
+        temporadas = list(range(1, self.generation))
+
+        ax.set_xticklabels(temporadas)
+
+        ax.set_xlabel('Generaciones')
+        ax.set_ylabel('Porcentajes')
+        ax.set_title('Promedios y Mejores Porcentajes por Generacion')
+        ax.legend()
+        plt.tight_layout()
+        
+        # Guardar la figura en un objeto BytesIO
+        buffer = io.BytesIO()
+        plt.savefig(buffer, format='png')
+        buffer.seek(0)
+        
+        # Limpiar la figura para liberar memoria
+        plt.close(fig)
+        
+        # Devolver el objeto BytesIO
+        return buffer
 
     def obtain_best_individuals(self, array_ind, ammount_best):
         # if not array_ind or ammount_best == 0:
